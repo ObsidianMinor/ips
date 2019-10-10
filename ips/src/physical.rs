@@ -9,7 +9,3 @@ pub trait Size {
     /// Gets the size of the value when serialized to an output
     fn size(&self) -> usize;
 }
-
-pub trait Write {
-    fn write_to(&self, output: &[u8]) -> Result<(), Error>;
-}
