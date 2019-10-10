@@ -190,6 +190,85 @@ pub struct Ethernet<V, P> {
     payload: P,
 }
 
+impl<V, P> Ethernet<V, P> {
+    /// Creates a VLAN header from the payload and the old header.
+    pub fn map_vlan<W, Q, F: FnOnce(V, P) -> (W, Q)>(self, f: F) -> Ethernet<W, Q> {
+        let Ethernet {
+            destination,
+            source,
+            vlan,
+            payload,
+        } = self;
+
+        let (vlan, payload) = f(vlan, payload);
+
+        Ethernet { destination, source, vlan, payload }
+    }
+    /// Creates a VLAN header from the payload and the old header, where the conversion function may fail with the specified error type.
+    pub fn try_map_vlan<W, Q, E, F: FnOnce(V, P) -> Result<(W, Q), E>>(self, f: F) -> Result<Ethernet<W, Q>, E> {
+        let Ethernet {
+            destination,
+            source,
+            vlan,
+            payload,
+        } = self;
+
+        let (vlan, payload) = f(vlan, payload)?;
+
+        Ok(Ethernet { destination, source, vlan, payload })
+    }
+    /// Creates a new VLAN header to a new type without using the payload to map the header.
+    pub fn map_vlan_no_payload<W, F: FnOnce(V) -> W>(self, f: F) -> Ethernet<W, P> {
+        let Ethernet {
+            destination,
+            source,
+            vlan,
+            payload,
+        } = self;
+
+        let vlan = f(vlan);
+
+        Ethernet { destination, source, vlan, payload }
+    }
+    /// Creates a new VLAN header to a new type without using the payload to map the header, where the conversion function may fail with the specified error type.
+    pub fn try_map_vlan_no_payload<W, E, F: FnOnce(V) -> Result<W, E>>(self, f: F) -> Result<Ethernet<W, P>, E> {
+        let Ethernet {
+            destination,
+            source,
+            vlan,
+            payload,
+        } = self;
+
+        let vlan = f(vlan)?;
+
+        Ok(Ethernet { destination, source, vlan, payload })
+    }
+    pub fn map_payload<Q, F: FnOnce(P) -> Q>(self, f: F) -> Ethernet<V, Q> {
+        let Ethernet {
+            destination,
+            source,
+            vlan,
+            payload,
+        } = self;
+
+        let payload = f(payload);
+
+        Ethernet { destination, source, vlan, payload }
+    }
+    pub fn try_map_payload<Q, E, F: FnOnce(P) -> Result<Q, E>>(self, f: F) -> Result<Ethernet<V, Q>, E> {
+        let Ethernet {
+            destination,
+            source,
+            vlan,
+            payload,
+        } = self;
+
+        let payload = f(payload)?;
+
+        Ok(Ethernet { destination, source, vlan, payload })
+    }
+}
+
 /// A double octet EtherType value
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct EtherType(pub u16);
@@ -216,4 +295,89 @@ pub struct Ethernet2<V, P> {
     /// For instances with an UnknownVlan header, this may be the the start of the VLAN header.
     pub etype: EtherType,
     payload: P
+}
+
+impl<V, P> Ethernet2<V, P> {
+    /// Creates a VLAN header from the payload and the old header.
+    pub fn map_vlan<W, Q, F: FnOnce(V, P) -> (W, Q)>(self, f: F) -> Ethernet2<W, Q> {
+        let Ethernet2 {
+            destination,
+            source,
+            vlan,
+            etype,
+            payload,
+        } = self;
+
+        let (vlan, payload) = f(vlan, payload);
+
+        Ethernet2 { destination, source, vlan, etype, payload }
+    }
+    /// Creates a VLAN header from the payload and the old header, where the conversion function may fail with the specified error type.
+    pub fn try_map_vlan<W, Q, E, F: FnOnce(V, P) -> Result<(W, Q), E>>(self, f: F) -> Result<Ethernet2<W, Q>, E> {
+        let Ethernet2 {
+            destination,
+            source,
+            vlan,
+            etype,
+            payload,
+        } = self;
+
+        let (vlan, payload) = f(vlan, payload)?;
+
+        Ok(Ethernet2 { destination, source, vlan, etype, payload })
+    }
+    /// Creates a new VLAN header to a new type without using the payload to map the header.
+    pub fn map_vlan_no_payload<W, F: FnOnce(V) -> W>(self, f: F) -> Ethernet2<W, P> {
+        let Ethernet2 {
+            destination,
+            source,
+            vlan,
+            etype,
+            payload,
+        } = self;
+
+        let vlan = f(vlan);
+
+        Ethernet2 { destination, source, vlan, etype, payload }
+    }
+    /// Creates a new VLAN header to a new type without using the payload to map the header, where the conversion function may fail with the specified error type.
+    pub fn try_map_vlan_no_payload<W, E, F: FnOnce(V) -> Result<W, E>>(self, f: F) -> Result<Ethernet2<W, P>, E> {
+        let Ethernet2 {
+            destination,
+            source,
+            vlan,
+            etype,
+            payload,
+        } = self;
+
+        let vlan = f(vlan)?;
+
+        Ok(Ethernet2 { destination, source, vlan, etype, payload })
+    }
+    pub fn map_payload<Q, F: FnOnce(P) -> Q>(self, f: F) -> Ethernet2<V, Q> {
+        let Ethernet2 {
+            destination,
+            source,
+            vlan,
+            etype,
+            payload,
+        } = self;
+
+        let payload = f(payload);
+
+        Ethernet2 { destination, source, vlan, etype, payload }
+    }
+    pub fn try_map_payload<Q, E, F: FnOnce(P) -> Result<Q, E>>(self, f: F) -> Result<Ethernet2<V, Q>, E> {
+        let Ethernet2 {
+            destination,
+            source,
+            vlan,
+            etype,
+            payload,
+        } = self;
+
+        let payload = f(payload)?;
+
+        Ok(Ethernet2 { destination, source, vlan, etype, payload })
+    }
 }
