@@ -1,0 +1,11 @@
+[package]
+name = "ips"
+description = "Types and traits for reading and writing packets in the Internet Protocol Suite"
+version = "0.0.1"
+authors = ["Sydney Acksman <obsidianminor@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+macress = { path = "../macress" }
